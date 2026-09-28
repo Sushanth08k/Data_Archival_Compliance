@@ -31,6 +31,10 @@ export default function LoginPage() {
 
   const handleGoogleSignIn = async () => {
     setError('');
+    if (!authService.isFirebaseConfigured()) {
+      setError('Google Sign-In requires Firebase configuration. You can sign in immediately using the Email & Password form below, or click "Create one" to register.');
+      return;
+    }
     setLoading(true);
 
     try {

@@ -39,6 +39,10 @@ export default function RegisterPage() {
 
   const handleGoogleSignUp = async () => {
     setError('');
+    if (!authService.isFirebaseConfigured()) {
+      setError('Google Sign-Up requires Firebase configuration. You can create an account immediately using the form below.');
+      return;
+    }
     setLoading(true);
 
     try {

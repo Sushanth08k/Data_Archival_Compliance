@@ -147,6 +147,10 @@ const authService = {
   isAuthenticated() {
     return !!localStorage.getItem('access_token');
   },
+
+  isFirebaseConfigured() {
+    return isFirebaseConfigured;
+  },
 };
 
 export default authService;
