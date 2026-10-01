@@ -706,8 +706,25 @@ export default function ControlRunsPage() {
 
             {/* Completed Alert */}
             {runDetail.run.status === 'COMPLETED' && (
-              <div className="alert alert-success" style={{ marginBottom: '20px' }}>
-                <strong>✅ Compliance Control Lifecycle Completed</strong> — Records have been safely archived in <code>archive_transactions</code>, independently verified, and cleaned from <code>source_transactions</code>.
+              <div
+                className="alert alert-success"
+                style={{
+                  marginBottom: '20px',
+                  display: 'block',
+                  lineHeight: '1.6',
+                }}
+              >
+                <span>
+                  <strong>✅ Compliance Control Lifecycle Completed</strong> — Records have been safely archived in{' '}
+                  <code style={{ background: 'rgba(6, 95, 70, 0.1)', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace' }}>
+                    archive_transactions
+                  </code>
+                  , independently verified, and cleaned from{' '}
+                  <code style={{ background: 'rgba(6, 95, 70, 0.1)', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace' }}>
+                    source_transactions
+                  </code>
+                  .
+                </span>
               </div>
             )}
 

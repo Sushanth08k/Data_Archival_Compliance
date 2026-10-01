@@ -86,7 +86,43 @@ export default function AppLayout() {
               <div className="sidebar-user-role">{formatRole(user?.role)}</div>
             </div>
           </div>
-          <button className="btn btn-sm" onClick={handleLogout} style={{ marginTop: '8px', width: '100%', color: 'rgba(255,255,255,0.6)' }}>
+          <button
+            className="btn btn-sm"
+            onClick={handleLogout}
+            style={{
+              marginTop: '10px',
+              width: '100%',
+              background: '#ffffff',
+              color: '#0f172a',
+              border: '1px solid #cbd5e1',
+              fontWeight: 600,
+              fontSize: '0.8125rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              cursor: 'pointer',
+              padding: '8px 12px',
+              borderRadius: 'var(--radius-sm)',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#fef2f2';
+              e.currentTarget.style.color = '#dc2626';
+              e.currentTarget.style.borderColor = '#fecaca';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = '#ffffff';
+              e.currentTarget.style.color = '#0f172a';
+              e.currentTarget.style.borderColor = '#cbd5e1';
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
             Sign out
           </button>
         </div>

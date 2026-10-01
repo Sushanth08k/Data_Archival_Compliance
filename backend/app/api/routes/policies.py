@@ -42,7 +42,7 @@ async def upload_policy(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    """Upload a policy document (PDF, DOCX, or TXT)."""
+    """Upload a policy document (PDF, DOCX, TXT, or MD)."""
     # Validate
     content = await file.read()
     is_valid, error = validate_upload(file.filename, len(content))

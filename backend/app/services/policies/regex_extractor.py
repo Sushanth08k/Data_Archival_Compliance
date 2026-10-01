@@ -47,19 +47,19 @@ def extract_policy_with_regex(text: str) -> dict[str, Any]:
 
     # 1. Extract Document Title / Name
     title = "Data Retention and Archival Policy"
-    first_line_match = re.search(r"^(?:[#=\s]*)(.*?)(?:\n|$)", text.strip())
+    first_line_match = re.search(r"^(?:[#=\s*]*)(.*?)(?:[#=\s*]*)(?:\n|$)", text.strip())
     if first_line_match:
-        cand = first_line_match.group(1).strip().strip("=")
+        cand = first_line_match.group(1).strip().strip("= \t*#")
         if len(cand) > 3 and not cand.startswith("---"):
             title = cand
 
     # Extract Policy ID if present
-    doc_id_match = re.search(r"Policy Document ID:\s*([^\n\r]+)", text, re.IGNORECASE)
+    doc_id_match = re.search(r"Policy\s+Document\s+ID:\s*([^\n\r]+)", text, re.IGNORECASE)
     doc_id = doc_id_match.group(1).strip() if doc_id_match else None
 
     # 2. Check if text has distinct Policy sections
     section_pattern = re.compile(
-        r"(?:={10,}\s*)?POLICY\s+(\d+):\s*([^\n\r]+)(.*?)(?=(?:={10,}\s*)?POLICY\s+\d+:|(?:={10,}\s*)?GLOBAL|$)",
+        r"(?:={10,}\s*|#{1,6}\s*|\*{1,2}\s*)?POLICY\s+(\d+)\s*:\s*([^\n\r]+?)(?:\*{1,2})?\s*(?:\n|$)(.*?)(?=(?:={10,}\s*|#{1,6}\s*|\*{1,2}\s*)?POLICY\s+\d+\s*:|(?:={10,}\s*|#{1,6}\s*|\*{1,2}\s*)?GLOBAL|$)",
         re.DOTALL | re.IGNORECASE,
     )
     sections = list(section_pattern.finditer(text))
@@ -75,17 +75,17 @@ def extract_policy_with_regex(text: str) -> dict[str, Any]:
         # Structured multi-policy document
         for match in sections:
             p_num = match.group(1)
-            p_title = match.group(2).strip()
+            p_title = match.group(2).strip().strip("*# ")
             p_body = match.group(3).strip()
 
             scopes_found.append(p_title)
 
             # Table & date field
-            table_m = re.search(r"Source table:\s*([a-zA-Z0-9_]+)", p_body, re.I)
+            table_m = re.search(r"(?:\*\*)?Source\s+table(?:\*\*)?:\s*([a-zA-Z0-9_]+)", p_body, re.I)
             table_name = table_m.group(1).strip() if table_m else "records"
 
             date_field_m = re.search(
-                r"(?:date field|closure field|creation date field|timestamp field):\s*([a-zA-Z0-9_]+)",
+                r"(?:\*\*)?(?:[a-zA-Z0-9_ ]*?(?:date|closure|creation|timestamp)\s+field)(?:\*\*)?:\s*([a-zA-Z0-9_]+)",
                 p_body,
                 re.I,
             )
@@ -93,20 +93,20 @@ def extract_policy_with_regex(text: str) -> dict[str, Any]:
 
             # Parse rule blocks
             rule_blocks = re.findall(
-                r"Rule\s+(\d+):\s*\n(.*?)(?=\n\s*(?:Rule\s+\d+:|Constraints:|$))",
+                r"(?:^|\n)\s*(?:[-*]\s*)?(?:\*\*)?Rule\s+(\d+)(?:\*\*)?:\s*\n?(.*?)(?=(?:\n\s*(?:[-*]\s*)?(?:\*\*)?Rule\s+\d+:?|(?:###\s*)?Constraints:|\Z))",
                 p_body,
                 re.DOTALL | re.IGNORECASE,
             )
 
             for r_idx, r_body in rule_blocks:
                 clean_body = " ".join(r_body.split())
-                op_m = re.search(r"Operation:\s*(\w+)", r_body, re.I)
+                op_m = re.search(r"(?:\*\*)?Operation(?:\*\*)?:\s*(\w+)", r_body, re.I)
                 op = op_m.group(1).upper() if op_m else "ARCHIVE"
 
                 if op in ("ARCHIVE", "RETAIN", "DELETE"):
                     # Find age condition
                     age_m = re.search(
-                        r"(?:older than|retained for (?:at least )?|more than|exceeding)\s+(\w+)\s+(years?|months?|days?)",
+                        r"(?:older\s+than|retained\s+for\s+(?:at\s+least\s+)?|more\s+than|exceeding)\s+(\w+)\s+(years?|months?|days?)",
                         r_body,
                         re.I,
                     )
@@ -130,7 +130,7 @@ def extract_policy_with_regex(text: str) -> dict[str, Any]:
 
                 elif op == "EXCLUDE":
                     cond_m = re.search(
-                        r"Condition:\s*\n?([a-zA-Z0-9_]+)\s+(?:equals|is|=)\s+([^\n\r\.]+)",
+                        r"(?:\*\*)?Condition(?:\*\*)?:\s*\n?([a-zA-Z0-9_]+)\s+(?:equals|is|=)\s+([^\n\r\.]+)",
                         r_body,
                         re.I,
                     )

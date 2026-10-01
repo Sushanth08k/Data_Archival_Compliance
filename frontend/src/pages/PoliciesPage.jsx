@@ -32,10 +32,20 @@ export default function PoliciesPage() {
     }
   };
 
+  const ALLOWED_EXTENSIONS = ['.pdf', '.docx', '.txt', '.md'];
+
   const handleUpload = async (file) => {
     if (!file) return;
     setError('');
     setSuccessMsg('');
+
+    const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      setError('Only PDF, DOCX, TXT, MD files are accepted');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -48,6 +58,7 @@ export default function PoliciesPage() {
       setError(getErrorMessage(err, 'Upload failed'));
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -100,7 +111,7 @@ export default function PoliciesPage() {
           type="file"
           ref={fileInputRef}
           onChange={handleFileSelect}
-          accept=".pdf,.docx,.txt"
+          accept=".pdf,.docx,.txt,.md"
           style={{ display: 'none' }}
         />
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-lighter)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom: '16px' }}>
@@ -120,7 +131,7 @@ export default function PoliciesPage() {
               Browse Files
             </button>
             <p style={{ marginTop: '12px', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
-              PDF, DOCX, TXT • Max 25 MB
+              PDF, DOCX, TXT, MD • Max 25 MB
             </p>
           </>
         )}
